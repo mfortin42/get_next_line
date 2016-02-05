@@ -1,33 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_strnjoin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mfortin <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/18 13:05:10 by mfortin           #+#    #+#             */
-/*   Updated: 2016/02/04 14:28:00 by mfortin          ###   ########.fr       */
+/*   Created: 2016/02/04 14:14:27 by mfortin           #+#    #+#             */
+/*   Updated: 2016/02/04 14:29:27 by mfortin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <fcntl.h>
-#include "get_next_line.h"
+#include "includes/libft.h"
 
-int	main(void)
+char	*ft_strnjoin(const char *s1, const char *s2, size_t len)
 {
-	char	*line;
-	int		fd;
+	char	*str;
+	int		nbr;
+	char	*d;
 
-	fd = 0;
-	while (1)
-	{
-		get_next_line(fd, &line);
-		if (line)
-		{
-			printf("%s\n", line);
-			line = NULL;
-		}
-	}
-	return (0);
+	nbr = ft_strlen(s1) + ++len;
+	str = ft_strnew(nbr);
+	d = str;
+	while (*s1)
+		*str++ = *s1++;
+	while (*s2 && --len > 0)
+		*str++ = *s2++;
+	*str = '\0';
+	return (str - (str - d));
 }

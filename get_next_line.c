@@ -5,63 +5,66 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mfortin <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/18 13:31:17 by mfortin           #+#    #+#             */
-/*   Updated: 2015/12/18 13:32:41 by mfortin          ###   ########.fr       */
+/*   Created: 2016/02/04 14:08:05 by mfortin           #+#    #+#             */
+/*   Updated: 2016/02/05 13:48:34 by mfortin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	**ft_new_fd(char **tmp, int fd)
+static t_list	*ft_find_fd(t_list **begin, int fd)
 {
-	char	**new_tmp;
-	int		i;
+	t_list *tmp;
 
-	i = -1;
-	if ((new_tmp = (char **)malloc(sizeof(char *) * (fd + 2))) == NULL)
-		return (NULL);
-	while (++i <= fd)
+	tmp = *begin;
+	if (tmp)
 	{
-		if (tmp != NULL && tmp[i] != '\0')
-			new_tmp[i] = ft_strdup(tmp[i]);
-		else
-			new_tmp[i] = ft_strnew(0);
+		while (tmp)
+		{
+			if (fd == (int)tmp->content_size)
+				return (tmp);
+			tmp = tmp->next;
+		}
 	}
-	new_tmp[i] = NULL;
-	return (new_tmp);
+	tmp = ft_lstnew("\0", 1);
+	tmp->content_size = fd;
+	ft_lstadd(begin, tmp);
+	return (tmp);
 }
 
-static int	ft_cnt_chr(char *tmp)
+static char		*ft_free_strnjoin(char *str, char *buff, int ret)
 {
-	unsigned int i;
+	char *tmp;
 
-	i = 0;
-	while (tmp[i] != '\n' && tmp[i] != '\0')
-		i++;
-	return (i);
+	tmp = str;
+	str = ft_strnjoin(str, buff, ret);
+	free(tmp);
+	return (str);
 }
 
-int			get_next_line(int fd, char **line)
+int				get_next_line(int const fd, char **line)
 {
 	char			buff[BUFF_SIZE + 1];
-	static char		**tmp = NULL;
 	int				vr;
+	static t_list	*list = NULL;
+	t_list			*begin;
+	char			*tmp;
 
-	if (fd < 0 || line == NULL || read(fd, buff, 0) < 0)
+	if (fd < 0 || line == NULL || read(fd, buff, 0))
 		return (-1);
-	if (tmp == NULL || tmp[fd] == '\0')
-		tmp = ft_new_fd(tmp, fd);
-	while (!(ft_strchr(tmp[fd], '\n')) && (vr = read(fd, buff, BUFF_SIZE)) > 0)
-	{
-		buff[vr] = '\0';
-		tmp[fd] = ft_strjoin(tmp[fd], buff);
-	}
-	*line = ft_strsub(tmp[fd], 0, ft_cnt_chr(tmp[fd]));
-	if (ft_strchr(tmp[fd], '\n'))
-	{
-		tmp[fd] = ft_strchr(tmp[fd], '\n') + 1;
-		return (1);
-	}
-	tmp[fd] += ft_cnt_chr(tmp[fd]);
+	begin = list;
+	list = ft_find_fd(&begin, fd);
+	while (!ft_strchr(list->content, '\n') && (vr = read(fd, buff, BUFF_SIZE)))
+		list->content = ft_free_strnjoin(list->content, buff, vr);
+	vr = 0;
+	while (((char *)list->content)[vr] && ((char *)list->content)[vr] != '\n')
+		++vr;
+	*line = ft_strndup(list->content, vr);
+	if (((char *)list->content)[vr] == '\n')
+		++vr;
+	tmp = list->content;
+	list->content = ft_strdup(list->content + vr);
+	free(tmp);
+	list = begin;
 	return (vr ? 1 : 0);
 }

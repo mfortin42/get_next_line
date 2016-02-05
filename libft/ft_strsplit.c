@@ -6,7 +6,7 @@
 /*   By: mfortin <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/23 20:49:19 by mfortin           #+#    #+#             */
-/*   Updated: 2015/12/18 12:01:00 by mfortin          ###   ########.fr       */
+/*   Updated: 2016/02/04 14:24:53 by mfortin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,6 @@ static int	ft_cntw(char const *s, char c)
 			i++;
 	}
 	return (cnt);
-}
-
-static char	*ft_strndup(const char *s, size_t n)
-{
-	char *str;
-
-	str = (char *)malloc(sizeof(char) * n + 1);
-	if (str == NULL)
-		return (NULL);
-	str = ft_strncpy(str, s, n);
-	str[n] = '\0';
-	return (str);
 }
 
 char		**ft_strsplit(char const *s, char c)
